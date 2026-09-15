@@ -61,23 +61,23 @@ Navigate to the **Data discovery** landing page.
    - In the **Description** box, enter \`Sensitive Data Model - Customer, Payment, Support\`.
    - Select the compartment for your target database, and then select the name of the target database.
 
-   ![Provide basic information](/kjlsinghoracle/security/blob/main/data-safe/discover-sensitive-data/images/provide-basic-information-page.png)
+   ![Provide basic information](https://github.com/kjlsinghoracle/security/blob/main/data-safe/discover-sensitive-data/images/provide-basic-information-page.png)
 
 3. For **Step 2 - Select schemas**, wait for the schemas to be refreshed if prompted to do so. Leave **Select specific schemas only** selected. Select the \`CUSTOMER\`, \`PAYMENT\`, and \`SUPPORT\` schemas, and then select **Next**. You might need to use the right arrow button at the bottom of the page to navigate to another page.
 
-   ![Select schemas](/kjlsinghoracle/security/blob/main/data-safe/discover-sensitive-data/images/select-schemas-page.png)
+   ![Select schemas](https://github.com/kjlsinghoracle/security/blob/main/data-safe/discover-sensitive-data/images/select-schemas-page.png)
 
 4. For **Step 3 - Select tables for schemas**, leave **All tables** selected, and select **Next**.
 
-   ![Select tables for selected schemas](/kjlsinghoracle/security/blob/main/data-safe/discover-sensitive-data/images/select-tables-for-selected-schemas.png)
+   ![Select tables for selected schemas](https://github.com/kjlsinghoracle/security/blob/main/data-safe/discover-sensitive-data/images/select-tables-for-selected-schemas.png)
 
 5. For **Step 4 - Select sensitive types**, review the common sensitive types. From the dropdown list, select **All sensitive types** and review them. Switch back to **Common sensitive types**, and then select all of the common sensitive types by selecting the **Sensitive type** check box. Select **Next**.
 
-   ![Select all common sensitive types](/kjlsinghoracle/security/blob/main/data-safe/discover-sensitive-data/images/select-all-common-sensitive-types.png)
+   ![Select all common sensitive types](https://github.com/kjlsinghoracle/security/blob/main/data-safe/discover-sensitive-data/images/select-all-common-sensitive-types.png)
 
 6. For **Step 5 - Select discovery options**, select **Collect, display and store sample data**.
 
-   ![Select discovery options](/kjlsinghoracle/security/blob/main/data-safe/discover-sensitive-data/images/select-discovery-options-page.png)
+   ![Select discovery options](https://github.com/kjlsinghoracle/security/blob/main/data-safe/discover-sensitive-data/images/select-discovery-options-page.png)
 
 7. Select **Create sensitive data model** to begin the data discovery process. Wait for the sensitive data model to be created.
 
@@ -97,7 +97,7 @@ Review the information about the sensitive data model.
   - **Sensitive columns discovered:** 14
   - **Sensitive types discovered:** 10
 
-  ![Sensitive Data Model Details tab](/kjlsinghoracle/security/blob/main/data-safe/discover-sensitive-data/images/sensitive-data-model-details-tab.png)
+  ![Sensitive Data Model Details tab](https://github.com/kjlsinghoracle/security/blob/main/data-safe/discover-sensitive-data/images/sensitive-data-model-details-tab.png)
 
 Select the **Sensitive columns** tab and review the discovered sensitive columns.
 
@@ -124,7 +124,7 @@ The expected 14-column discovery inventory is:
 | SUPPORT | SUPPORT_TICKETS | CONTACT_EMAIL | Email Address |
 | SUPPORT | SUPPORT_TICKETS | CONTACT_PHONE | Phone Number |
 
-![Sensitive Data Model Sensitive Columns tab](/kjlsinghoracle/security/blob/main/data-safe/discover-sensitive-data/images/sensitive-data-model-sensitive-columns-tab.png)
+![Sensitive Data Model Sensitive Columns tab](https://github.com/kjlsinghoracle/security/blob/main/data-safe/discover-sensitive-data/images/sensitive-data-model-sensitive-columns-tab.png)
 
 You may now **proceed to the next lab**.
 
