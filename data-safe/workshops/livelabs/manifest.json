@@ -29,7 +29,7 @@
       {
         "title": "Lab 4: Discover sensitive data",
         "description": "This lab shows you how to discover sensitive data on your target database by using the Data Discovery feature in Oracle Data Safe.",
-        "filename": "../../discover-sensitive-data/discover-sensitive-data.md",
+        "filename": "../../discover-sensitive-data/discover-sensitive-data-customer-payment-support.md",
         "type": "livelabs"
       },
       {
