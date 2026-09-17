@@ -37,10 +37,8 @@ In this lab, you will:
 - Review the sensitive columns identified by SDM1
 - Create a masking policy from SDM1
 - Review the generated masking columns and formats
-- Confirm compatible masking formats for customer, payment, and support values
 - Preserve relationships between related address values by using group masking
 - Perform a pre-masking check
-- Stop before running the masking operation
 
 
 ### Prerequisites
