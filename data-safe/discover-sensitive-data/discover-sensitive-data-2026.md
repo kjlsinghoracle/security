@@ -42,7 +42,7 @@ This lab assumes you have:
 
 2. In **Provide basic information**, enter the following, and then select **Next**:
 
-   - **Name:** `SDM_CPS_2026` (or a unique name in your compartment).
+   - **Name:** `SDM1` (or a unique name in your compartment).
    - **Compartment:** your workshop compartment.
    - **Description:** `Sensitive data inventory for customer application testing`.
    - **Select database compartment** and **Select database:** the compartment and registered target database for this workshop. The screenshots use `ADB_2`.
@@ -59,7 +59,7 @@ This lab assumes you have:
 
    ![Discovery options with sample collection and application-level relationship discovery unselected](images/2026-discovery-options.png)
 
-7. Select **Create sensitive data model**. Wait until the `SDM_CPS_2026` model becomes **Active**.
+7. Select **Create sensitive data model**. Wait until the `SDM1` model becomes **Active**.
 
 ## Task 2: Review the initial discovery results
 
@@ -91,7 +91,7 @@ This lab assumes you have:
 
 ## Task 3: Run incremental discovery for support
 
-The application testing scope now includes customer-support tickets. Reuse `SDM_CPS_2026` to discover the additional sensitive data.
+The application testing scope now includes customer-support tickets. Reuse `SDM1` to discover the additional sensitive data.
 
 1. Select the **Incremental discovery** tab, and then select **Run discovery now** under **Discovery job results**.
 
@@ -99,7 +99,7 @@ The application testing scope now includes customer-support tickets. Reuse `SDM_
 
    ![Run discovery now dialog with Adjust the scope for the incremental discovery selected](images/2026-adjust-incremental-scope.png)
 
-3. In **Provide basic information**, name the job `Discover_SUPPORT_2026`, review the compartment, and select **Next**.
+3. In **Provide basic information**, name the job `Discover_SUPPORT`, review the compartment, and select **Next**.
 
 4. In **Select schemas**, keep **Select specific schemas only** selected. Clear the preselected `CUSTOMER` and `PAYMENT` checkboxes, select `SUPPORT`, and select **Next**. This limits the new discovery job to support data; the existing customer and payment columns remain in the model.
 
