@@ -59,7 +59,6 @@ This lab assumes you have:
 
 - Your compartment name, target database name, dates, and discovery results can differ from the screenshots.
 - SDM1 contains 13 sensitive columns across four tables. If your model has a different count, use the columns shown in your own model.
-- The screenshots avoid displaying database row values. Do not add real customer, payment, or support data to screenshots or documentation.
 
 
 ## Task 1: Review the sensitive columns in your target database
