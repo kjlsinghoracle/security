@@ -28,8 +28,8 @@
       },
       {
         "title": "Lab 4: Discover sensitive data",
-        "description": "This lab shows you how to discover sensitive data on your target database by using the Data Discovery feature in Oracle Data Safe.",
-        "filename": "../../discover-sensitive-data/discover-sensitive-data-customer-payment-support.md",
+        "description": "Discover sensitive data in customer and payment schemas, then use incremental discovery to add support data to the same sensitive data model in Oracle Data Safe.",
+        "filename": "../../discover-sensitive-data/discover-sensitive-data-2026.md",
         "type": "livelabs"
       },
       {
@@ -56,4 +56,4 @@
         "filename": "https://livelabs.oracle.com/cdn/common/labs/need-help/need-help-livelabs.md"
       }
     ]
-  }
+}
