@@ -13,13 +13,19 @@ Data Discovery identified sensitive columns in the `CUSTOMER`, `PAYMENT`, and `S
 The application team needs realistic records to test customer profiles, orders, payments, and support tickets. However, the team does not need access to real names, contact details, dates of birth, national identifiers, addresses, or payment-card holder names. A masking policy replaces those values with safe, usable values while retaining the structure needed for testing.
 
 
+Subsetting and masking will be run together later to create a smaller, protected copy for the application team.
+
+
 ### Scenario
 
 
 Continue acting as the database security administrator. The discovery work is complete, and `SDM1` now covers the sensitive data needed for the retail application test scenario.
 
 
-The next control is to create a masking policy from `SDM1`. You will review the generated column mappings, confirm that the values have compatible masking formats, group related address values so that they remain meaningful together, and perform a pre-masking check.
+The next control is to create a masking policy from `SDM1`. You will review the generated column mappings, keep the generated masking formats, group related address values so that they remain meaningful together, and perform a pre-masking check.
+
+
+After the pre-masking check, the next lab step will run subsetting and masking together. This lab does not start either operation.
 
 
 This lab intentionally stops after the pre-masking check. Do not select **Mask data** or start a masking job.
@@ -51,8 +57,6 @@ This lab assumes you have:
 - Access to a registered target database containing the `CUSTOMER`, `PAYMENT`, and `SUPPORT` schemas
 - An active sensitive data model named `SDM1` created in the Data Discovery lab
 - The Data Masking role granted on the target database when working in your own tenancy
-- Permissions to create and update masking policies in your compartment
-- The `ADMIN` password for the target database, if Database Actions prompts you to sign in
 
 
 ### Assumptions
@@ -60,7 +64,6 @@ This lab assumes you have:
 
 - Your compartment name, target database name, dates, and discovery results can differ from the screenshots.
 - `SDM1` contains 13 sensitive columns across four tables. If your model has a different count, use the columns shown in your own model.
-- The screenshots avoid displaying database row values. Do not add real customer, payment, or support data to screenshots or documentation.
 
 
 ## Task 1 (For your tenancy only): Grant the Data Masking role on your target database
@@ -107,34 +110,33 @@ Review the tables that contain the sensitive columns identified by `SDM1`.
    | `PAYMENT` | `PAYMENTS` | `CARDHOLDER_NAME` |
    | `SUPPORT` | `SUPPORT_TICKETS` | `CONTACT_EMAIL`, `CONTACT_PHONE` |
 
+
+![SDM1 table inventory for Database Actions review](images/2026-sdm1-table-inventory.svg)
+
 3. Drag a table to the worksheet. The existing masking lab uses the Navigator drag-and-drop interaction shown below. In this lab, repeat the interaction for `CUSTOMER.CUSTOMERS`, `CUSTOMER.ORDERS`, `PAYMENT.PAYMENTS`, and `SUPPORT.SUPPORT_TICKETS`.
 
 
-![Database Actions table selection](images/drag-employees-table-to-worksheet.png)
 
 
 4. When prompted for an insertion type, select **Select**, and then select **Apply**.
 
 
-![Database Actions insertion type](images/insertion-type-select.png)
 
 5. Review the generated SQL on the worksheet.
 
 
-![Database Actions worksheet SQL](images/query-employees-table.png)
 
 
 6. On the toolbar, select **Run Script**.
 
 
-![Database Actions Run Script button](images/run-script.png)
 
-7. On the **Script Output** tab, confirm that the table contains the columns identified by Data Discovery. Do not copy real row values into screenshots or lab notes.
+7. On the **Script Output** tab, review the column headings against the `SDM1` inventory. Do not record row values.
 
 8. Repeat steps 3 through 7 for the remaining tables. Keep the Database Actions browser tab open because you return to it later.
 
 
-The screenshots above illustrate the Database Actions interaction. The table inventory in this task is authoritative: use the `CUSTOMER`, `PAYMENT`, and `SUPPORT` schemas and the tables listed above.
+The reference visual above shows the authoritative inventory for this task: use the `CUSTOMER`, `PAYMENT`, and `SUPPORT` schemas and the tables listed above.
 
 
 ## Task 3: Create a masking policy from SDM1
@@ -153,7 +155,7 @@ Data Masking can generate a masking policy from a sensitive data model. It pulls
 
 5. Configure the masking policy as follows:
 
-   - **Name:** `Mask SDM1 Customer Payment Support`
+   - **Name:** `Mask_SDM1`
    - **Compartment:** Your workshop compartment
    - **Description:** `Masking policy for the CUSTOMER, PAYMENT, and SUPPORT schemas discovered by SDM1`
    - **Choose how you want to create the masking policy:** Leave **Using a sensitive data model** selected.
@@ -164,25 +166,25 @@ Data Masking can generate a masking policy from a sensitive data model. It pulls
 7. Wait for the operation to complete and for the masking policy to become **Active**. Do not close the creation panel while Data Safe is adding the model columns to the policy.
 
 
-![Create a masking policy from SDM1](images/create-masking-policy-sdm1.png)
+![Create the Mask_SDM1 policy from SDM1](images/2026-sdm1-policy-create.svg)
 
 
 ### Review the generated policy and masking formats
 
 
-Review the generated policy and its masking formats before continuing. The screenshots in this section show the policy generated from the 13-column `SDM1` inventory for this lab. Timestamps and compartment names can differ in your tenancy, but the table and column inventory should match.
+Review the generated policy and its masking formats before continuing. The reference visuals in this section show the policy generated from the 13-column `SDM1` inventory for this lab. Target names, timestamps, and compartment names can differ in your tenancy, but the table and column inventory should match.
 
 
 1. On the masking policy page, review the **Details** tab.
 
-2. Under **General information**, confirm that the policy name is `Mask SDM1 Customer Payment Support` and that it is linked to the `SDM1` discovery inventory.
+2. Under **General information**, confirm that the policy name is `Mask_SDM1` and that it is linked to the `SDM1` discovery inventory.
 
 3. Under **Column source**, confirm that the target database is the database used by the discovery lab.
 
 4. Under **Masking options**, review the configured options, including temporary tables, redo logging, statistics refreshing, degree of parallelism, and recompilation.
 
 
-![Masking policy Details tab for the SDM1 customer-payment-support policy](https://github.com/user-attachments/assets/9110c449-26d1-4b3a-b90a-61c090b89d71)
+![Mask_SDM1 policy details](images/2026-sdm1-policy-details.svg)
 
 
 5. Select the **Masking columns** tab. Confirm that the policy contains these 13 columns and the generated formats:
@@ -204,35 +206,22 @@ Review the generated policy and its masking formats before continuing. The scree
    | `SUPPORT` | `SUPPORT_TICKETS` | `CONTACT_PHONE` | US Phone Number |
 
 
-![Masking columns tab showing the SDM1 customer-payment-support columns](https://github.com/user-attachments/assets/31a186a7-5910-4cf8-bad6-23de460f7e52)
+![Mask_SDM1 masking columns and generated formats](images/2026-sdm1-masking-columns.svg)
 
 
-6. Review the default masking format for each column. Every sensitive column should have a compatible masking format. If a column is missing, return to the `SDM1` model and verify that the discovery results were approved and applied before continuing.
-
-7. To adjust a format, locate a sensitive column such as `SSN` in `CUSTOMER.CUSTOMERS`.
-
-8. Select the three-dot menu for the row, and then select **View/Edit masking format**. The **Edit format entry** panel opens.
+6. Review the generated format for each column against the table above. No format changes are required for this lab; keep the generated formats and return to the masking columns table if a column is missing.
 
 
-![Edit masking format for the SDM1 SSN column](https://github.com/user-attachments/assets/1fdc3f2f-f893-453b-82b8-e5245914ace3)
-
-
-9. Confirm that the selected format is compatible with the column data type and does not preserve the original value. If you change the format, select a compatible random or deterministic masking format offered by the console.
-
-10. Select **Update**.
-
-11. Repeat the review for the name, date-of-birth, email, phone, cardholder-name, and support-contact columns. Keep the automatically selected format when it is already appropriate.
-
-12. From the **Actions** menu, select **Save masking formats**. Wait for the save operation to finish before continuing.
-
-
-The masking policy is the bridge between the discovery inventory and the protection step: `SDM1` identifies what must be protected, and the policy defines how each value will be transformed. Do not use a masking format that exposes the original value, and do not remove a sensitive column from the policy merely because it is not needed for the first test query.
+The masking policy is the bridge between the discovery inventory and the protection step: `SDM1` identifies what must be protected, and `Mask_SDM1` carries the generated formats into the later subsetting-and-masking operation.
 
 
 ## Task 4: Create group masks
 
 
 Use group masking so that an address and its corresponding postal code remain a meaningful pair after masking. Create one group for customer addresses and one group for order shipping addresses. The two groups are independent because they preserve relationships within different tables.
+
+
+![SDM1 group masking assignments](images/2026-masking-groups.svg)
 
 
 ### Customer address group
@@ -255,9 +244,6 @@ Use group masking so that an address and its corresponding postal code remain a 
 8. Select **Add column**. In the new **Group masking column name** drop-down list, select `POSTAL_CODE`.
 
 9. Select **Continue**. Confirm that both columns show the `Customer_Address` masking group.
-
-
-![Group mask configuration](images/group-mask1.png)
 
 
 ### Shipping address group
@@ -287,9 +273,6 @@ Use group masking so that an address and its corresponding postal code remain a 
 The groups preserve the relationship within each address record. They do not cause customer addresses and shipping addresses to share values, and they do not change the `CUSTOMER_ID` or other non-sensitive key columns.
 
 
-![Masking group](images/masking-group.png)
-
-
 ## Task 5: Perform a pre-masking check
 
 
@@ -302,7 +285,7 @@ The pre-masking check looks for known issues that could prevent a masking run, s
 
 3. Select the compartment for the target database, if needed, and then select the target database used by `SDM1`.
 
-4. Select the compartment for the masking policy, if needed, and then select `Mask SDM1`.
+4. Select the compartment for the masking policy, if needed, and then select `Mask_SDM1`.
 
 5. For **Pre-masking report compartment**, select your workshop compartment.
 
@@ -311,16 +294,16 @@ The pre-masking check looks for known issues that could prevent a masking run, s
 7. Select the **Log messages** tab and verify the result of each check. Review the **Work requests** tab as well and confirm that the pre-check operations succeeded.
 
 
-![Pre-masking check](images/pre-masking-check-panel.png)
+![SDM1 pre-masking check configuration](images/2026-sdm1-pre-masking-check.svg)
 
 
-![Pre-masking verification](images/pre-masking-verification.png)
+![SDM1 pre-masking verification](images/2026-sdm1-pre-masking-verification.svg)
 
 
 If a check fails, record the message and resolve the issue before any masking run. Do not select **Mask data**.
 
 
-This completes the lab. The masking operation and post-masking validation will be covered separately.
+This completes the lab. The next lab step will run subsetting and masking together to produce the smaller, protected copy; do not select **Mask data** here.
 
 
 ### Learn More
