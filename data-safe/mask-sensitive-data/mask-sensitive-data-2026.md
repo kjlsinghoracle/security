@@ -35,12 +35,10 @@ In this lab, you will:
 
 
 - Grant the Data Masking role on the target database when working in your own tenancy
-- Review the sensitive columns identified by `SDM1`
 - Create a masking policy from `SDM1`
 - Review the generated masking columns and confirm compatible masking formats
 - Create group masks for related address values
 - Perform a pre-masking check
-- Stop before running the masking operation
 
 
 ### Prerequisites
