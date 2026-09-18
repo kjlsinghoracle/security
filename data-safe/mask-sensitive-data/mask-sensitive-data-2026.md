@@ -134,16 +134,7 @@ Review the tables that contain the sensitive columns identified by `SDM1`.
 8. Repeat steps 3 through 7 for the remaining tables. Keep the Database Actions browser tab open because you return to it later.
 
 
-The reusable screenshots above come from the existing masking lab and show its original `HCM1` example. Use them as interface references only; select the `CUSTOMER`, `PAYMENT`, and `SUPPORT` schemas and the tables listed in this lab.
-
-
-The captured `SDM1` inventory contains 13 sensitive columns: eight in `CUSTOMER.CUSTOMERS`, two in `CUSTOMER.ORDERS`, one in `PAYMENT.PAYMENTS`, and two in `SUPPORT.SUPPORT_TICKETS`.
-
-
-The diagram shows the planned `Customer_Address` and `Shipping_Address` groups separately because each preserves the address-and-postal-code relationship within its own table. They are independent relationships and should not share masked values across `CUSTOMER.CUSTOMERS` and `CUSTOMER.ORDERS`. The groups are created in Task 4.
-
-
-![SDM1 masking scope](images/2026-sdm1-masking-scope.svg)
+The screenshots above illustrate the Database Actions interaction. The table inventory in this task is authoritative: use the `CUSTOMER`, `PAYMENT`, and `SUPPORT` schemas and the tables listed above.
 
 
 ## Task 3: Create a masking policy from SDM1
@@ -162,9 +153,9 @@ Data Masking can generate a masking policy from a sensitive data model. It pulls
 
 5. Configure the masking policy as follows:
 
-   - **Name:** `Mask SDM1`
+   - **Name:** `Mask SDM1 Customer Payment Support`
    - **Compartment:** Your workshop compartment
-   - **Description:** `Masking policy for SDM1 customer, payment, and support data`
+   - **Description:** `Masking policy for the CUSTOMER, PAYMENT, and SUPPORT schemas discovered by SDM1`
    - **Choose how you want to create the masking policy:** Leave **Using a sensitive data model** selected.
    - **Sensitive Data Model:** Select the compartment containing `SDM1`, and then select `SDM1`.
 
@@ -179,32 +170,41 @@ Data Masking can generate a masking policy from a sensitive data model. It pulls
 ### Review the generated policy and masking formats
 
 
-Review the generated policy and its masking formats before continuing.
-
-The console screenshots in this section are interface references captured from a masking policy in the same tenancy. Your policy name, sensitive data model, column inventory, and suggested formats may differ; follow the `SDM1` inventory and values shown in this lab for your target database.
+Review the generated policy and its masking formats before continuing. The screenshots in this section show the policy generated from the 13-column `SDM1` inventory for this lab. Timestamps and compartment names can differ in your tenancy, but the table and column inventory should match.
 
 
 1. On the masking policy page, review the **Details** tab.
 
-2. Under **General information**, confirm that the policy name is `Mask SDM1` and that the sensitive data model is `SDM1`.
+2. Under **General information**, confirm that the policy name is `Mask SDM1 Customer Payment Support` and that it is linked to the `SDM1` discovery inventory.
 
 3. Under **Column source**, confirm that the target database is the database used by the discovery lab.
 
 4. Under **Masking options**, review the configured options, including temporary tables, redo logging, statistics refreshing, degree of parallelism, and recompilation.
 
 
-![Masking policy Details tab](images/masking-policy-details-tab.png)
+![Masking policy Details tab for the SDM1 customer-payment-support policy](https://github.com/user-attachments/assets/9110c449-26d1-4b3a-b90a-61c090b89d71)
 
 
-5. Select the **Masking columns** tab. Confirm that the policy contains the sensitive columns from all four tables:
+5. Select the **Masking columns** tab. Confirm that the policy contains these 13 columns and the generated formats:
 
-   - `CUSTOMER.CUSTOMERS`
-   - `CUSTOMER.ORDERS`
-   - `PAYMENT.PAYMENTS`
-   - `SUPPORT.SUPPORT_TICKETS`
+   | Schema | Table | Column | Generated format |
+   | --- | --- | --- | --- |
+   | `CUSTOMER` | `CUSTOMERS` | `CUSTOMER_ADDRESS` | Format Preserving Randomization |
+   | `CUSTOMER` | `CUSTOMERS` | `DATE_OF_BIRTH` | Date-Past |
+   | `CUSTOMER` | `CUSTOMERS` | `EMAIL_ADDRESS` | Email Address |
+   | `CUSTOMER` | `CUSTOMERS` | `FIRST_NAME` | Random Name |
+   | `CUSTOMER` | `CUSTOMERS` | `LAST_NAME` | Random Name |
+   | `CUSTOMER` | `CUSTOMERS` | `PHONE_NUMBER` | US Phone Number |
+   | `CUSTOMER` | `CUSTOMERS` | `POSTAL_CODE` | Format Preserving Randomization |
+   | `CUSTOMER` | `CUSTOMERS` | `SSN` | Random String |
+   | `CUSTOMER` | `ORDERS` | `SHIPPING_ADDRESS` | Format Preserving Randomization |
+   | `CUSTOMER` | `ORDERS` | `SHIPPING_ZIP` | Format Preserving Randomization |
+   | `PAYMENT` | `PAYMENTS` | `CARDHOLDER_NAME` | Random Name |
+   | `SUPPORT` | `SUPPORT_TICKETS` | `CONTACT_EMAIL` | Email Address |
+   | `SUPPORT` | `SUPPORT_TICKETS` | `CONTACT_PHONE` | US Phone Number |
 
 
-![Masking columns tab](images/masking-columns-tab.png)
+![Masking columns tab showing the SDM1 customer-payment-support columns](https://github.com/user-attachments/assets/31a186a7-5910-4cf8-bad6-23de460f7e52)
 
 
 6. Review the default masking format for each column. Every sensitive column should have a compatible masking format. If a column is missing, return to the `SDM1` model and verify that the discovery results were approved and applied before continuing.
@@ -214,7 +214,7 @@ The console screenshots in this section are interface references captured from a
 8. Select the three-dot menu for the row, and then select **View/Edit masking format**. The **Edit format entry** panel opens.
 
 
-![Edit masking format](images/edit-masking-format-page.png)
+![Edit masking format for the SDM1 SSN column](https://github.com/user-attachments/assets/1fdc3f2f-f893-453b-82b8-e5245914ace3)
 
 
 9. Confirm that the selected format is compatible with the column data type and does not preserve the original value. If you change the format, select a compatible random or deterministic masking format offered by the console.
