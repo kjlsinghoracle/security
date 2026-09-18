@@ -25,9 +25,7 @@ Continue acting as the database security administrator. The discovery work is co
 The next control is to create a masking policy from `SDM1`. You will review the generated column mappings, keep the generated masking formats, group related address values so that they remain meaningful together, and perform a pre-masking check.
 
 
-After the pre-masking check, the next lab step will run subsetting and masking together. This lab does not start either operation.
-
-
+After the pre-masking check, the next lab step will run subsetting and masking together. 
 This lab intentionally stops after the pre-masking check. Do not select **Mask data** or start a masking job.
 
 
