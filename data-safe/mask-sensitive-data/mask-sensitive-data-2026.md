@@ -109,7 +109,7 @@ Review the tables that contain the sensitive columns identified by `SDM1`.
    | `SUPPORT` | `SUPPORT_TICKETS` | `CONTACT_EMAIL`, `CONTACT_PHONE` |
 
 
-![SDM1 table inventory for Database Actions review](images/2026-sdm1-table-inventory.svg)
+![Live SDM_CPS_2026 sensitive column inventory in OCI Data Safe](images/sensitive-data-model.png)
 
 3. Drag a table to the worksheet. The existing masking lab uses the Navigator drag-and-drop interaction shown below. In this lab, repeat the interaction for `CUSTOMER.CUSTOMERS`, `CUSTOMER.ORDERS`, `PAYMENT.PAYMENTS`, and `SUPPORT.SUPPORT_TICKETS`.
 
@@ -164,7 +164,7 @@ Data Masking can generate a masking policy from a sensitive data model. It pulls
 7. Wait for the operation to complete and for the masking policy to become **Active**. Do not close the creation panel while Data Safe is adding the model columns to the policy.
 
 
-![Create the Mask_SDM1 policy from SDM1](images/2026-sdm1-policy-create.svg)
+![Live OCI Data Safe masking policies list](images/masking-policies-list.png)
 
 
 ### Review the generated policy and masking formats
@@ -182,7 +182,7 @@ Review the generated policy and its masking formats before continuing. The refer
 4. Under **Masking options**, review the configured options, including temporary tables, redo logging, statistics refreshing, degree of parallelism, and recompilation.
 
 
-![Mask_SDM1 policy details](images/2026-sdm1-policy-details.svg)
+![Live Mask SDM1 Customer Payment Support policy details in OCI Data Safe](images/policy-details.png)
 
 
 5. Select the **Masking columns** tab. Confirm that the policy contains these 13 columns and the generated formats:
@@ -204,7 +204,7 @@ Review the generated policy and its masking formats before continuing. The refer
    | `SUPPORT` | `SUPPORT_TICKETS` | `CONTACT_PHONE` | US Phone Number |
 
 
-![Mask_SDM1 masking columns and generated formats](images/2026-sdm1-masking-columns.svg)
+![Live masking columns and generated formats in OCI Data Safe](images/masking-columns.png)
 
 
 6. Review the generated format for each column against the table above. No format changes are required for this lab; keep the generated formats and return to the masking columns table if a column is missing.
@@ -219,7 +219,7 @@ The masking policy is the bridge between the discovery inventory and the protect
 Use group masking so that an address and its corresponding postal code remain a meaningful pair after masking. Create one group for customer addresses and one group for order shipping addresses. The two groups are independent because they preserve relationships within different tables.
 
 
-![SDM1 group masking assignments](images/2026-masking-groups.svg)
+![Live group masking form in OCI Data Safe](images/group-masking.png)
 
 
 ### Customer address group
@@ -292,10 +292,10 @@ The pre-masking check looks for known issues that could prevent a masking run, s
 7. Select the **Log messages** tab and verify the result of each check. Review the **Work requests** tab as well and confirm that the pre-check operations succeeded.
 
 
-![SDM1 pre-masking check configuration](images/2026-sdm1-pre-masking-check.svg)
+![Live pre-masking report details in OCI Data Safe](images/pre-masking-verification.png)
 
 
-![SDM1 pre-masking verification](images/2026-sdm1-pre-masking-verification.svg)
+![Live pre-masking check log messages in OCI Data Safe](images/pre-masking-log.png)
 
 
 If a check fails, record the message and resolve the issue before any masking run. Do not select **Mask data**.
