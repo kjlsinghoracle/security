@@ -15,7 +15,7 @@ Estimated Time: 20 minutes
 - Open the Data Safe data subsetting overview and start the **Subset database** workflow.
 - Create a subsetting policy that includes the `CUSTOMER`, `PAYMENT`, and `SUPPORT` schemas.
 - Add a driving-table rule for `CUSTOMER.ORDERS`.
-- Filter `ORDER_DATE >= 2026-01-01`, then retain 10% of the matching rows.
+- In OCI's condition field, enter `ORDER_DATE >= '01-JAN-26'`, then retain 10% of the matching rows. This is the OCI UI representation of January 1, 2026; use the ANSI SQL form `DATE '2026-01-01'` in SQL Developer or Database Actions.
 - Keep referenced ancestor rows and referencing descendant rows so referential integrity is preserved.
 - Review the subsetting options and submit only when the configuration is correct.
 
@@ -64,7 +64,7 @@ WHERE ORDER_DATE >= DATE '2026-01-01';
 ### Task 2: Create the subsetting policy scope
 
 1. Set the policy compartment to the workshop compartment.
-2. Give the policy a descriptive name such as `Subset_SDM_CPS_2026_2026`.
+2. Give the policy a descriptive name such as `Subset_SDM1_2026`.
 3. Add a description such as `Recent 2026 customer transaction data for application testing`.
 4. Select **Get schemas from sensitive data model**.
 5. In the sensitive data model compartment, select the model created in the Data Discovery lab, such as `SDM_mainLL` in the reference environment.
@@ -81,14 +81,14 @@ WHERE ORDER_DATE >= DATE '2026-01-01';
 4. Configure the condition:
    - Column: `ORDER_DATE`
    - Operator: `>=`
-   - Value: `2026-01-01`
+   - Value: `01-JAN-26`
 5. Set **Percentage of rows to retain** to `10`.
 6. Keep **Keep only referenced rows** for ancestors so matching `CUSTOMER.CUSTOMERS` rows are retained.
 7. Keep **Keep only referencing rows** for descendants so matching `CUSTOMER.ORDER_ITEMS` and `PAYMENT.PAYMENTS` rows remain consistent.
 8. For other related tables, keep the default **Keep maximum rows** unless the test scenario requires a different policy.
 9. Review the relationship graph before continuing.
 
-The workflow applies the date condition first and the 10% retention second. It does not mean “10% of the full database”; it means 10% of the rows that satisfy `ORDER_DATE >= 2026-01-01`.
+The workflow applies the date condition first and the 10% retention second. It does not mean “10% of the full database”; it means 10% of the rows that satisfy `ORDER_DATE >= '01-JAN-26'`. In SQL, the equivalent date predicate is `ORDER_DATE >= DATE '2026-01-01'`.
 
 ![ORDER_DATE condition and 10 percent retention](images/condition-percentage-rule.png)
 
@@ -156,7 +156,7 @@ Confirm that the order count is smaller than the source count, that the retained
 | Target database | `ADB_2` or your registered target database |
 | Schemas | `CUSTOMER`, `PAYMENT`, `SUPPORT` |
 | Driving table | `CUSTOMER.ORDERS` |
-| Condition | `ORDER_DATE >= 2026-01-01` |
+| Condition | `ORDER_DATE >= '01-JAN-26'` in the OCI UI; `ORDER_DATE >= DATE '2026-01-01'` in SQL |
 | Retention | 10% of condition-matching rows |
 | Ancestors | Keep only referenced rows |
 | Descendants | Keep only referencing rows |
