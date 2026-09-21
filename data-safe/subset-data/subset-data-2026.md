@@ -2,11 +2,11 @@
 
 ## Introduction
 
-In the previous labs, Data Discovery identified sensitive data across the `CUSTOMER`, `PAYMENT`, and `SUPPORT` schemas for application testing. The sensitive data model inventory was used to create a masking policy, and the pre-masking checks confirmed that the target database was ready.
+The application team needs a realistic test copy of the retail application data. Developers must be able to test customer profiles, orders, payments, and support tickets, but they should work with a smaller dataset that is isolated from the full source population. The copy must retain the relationships the application expects, including customers related to orders and the rows related to those orders.
 
-The next control is data subsetting. Use the OCI Data Safe **Subset database** workflow to create a smaller, referentially consistent copy for non-production application testing. This lab keeps recent 2026 orders and then retains 10% of the rows that match the date condition. Related customer and order-item/payment rows remain aligned through the relationship settings.
+In the previous labs, Data Discovery identified sensitive data across the `CUSTOMER`, `PAYMENT`, and `SUPPORT` schemas. The sensitive data model inventory was used to create a masking policy, and the pre-masking checks confirmed that the target database was ready. This lab continues that story by preparing a recent, smaller dataset for application testing.
 
-Do not submit a subsetting job until you have reviewed the rule and confirmed the target database and policy.
+Use the OCI Data Safe **Subset database** workflow to keep recent 2026 orders and then retain 10% of the rows that match the date condition. Related customer and order-item/payment rows remain aligned through the relationship settings.
 
 Estimated Time: 20 minutes
 
@@ -30,13 +30,34 @@ Estimated Time: 20 minutes
 
 Continue acting as the database security administrator. The application team needs a recent, smaller dataset for testing customer profiles, orders, payments, and support tickets. Masking has already been planned and pre-checked. Now subset the source while preserving the relationships needed by the application.
 
-### Task 1: Open the subset database workflow
+### Before you begin: Capture baseline row counts
+
+Before subsetting, connect to the source database in SQL Developer or Database Actions and record the starting row counts. These counts make it easy to confirm the effect of the subset operation later.
+
+```sql
+SELECT 'CUSTOMER.ORDERS' AS table_name, COUNT(*) AS rows_before FROM CUSTOMER.ORDERS
+UNION ALL
+SELECT 'CUSTOMER.CUSTOMERS', COUNT(*) FROM CUSTOMER.CUSTOMERS
+UNION ALL
+SELECT 'CUSTOMER.ORDER_ITEMS', COUNT(*) FROM CUSTOMER.ORDER_ITEMS
+UNION ALL
+SELECT 'PAYMENT.PAYMENTS', COUNT(*) FROM PAYMENT.PAYMENTS
+UNION ALL
+SELECT 'SUPPORT.SUPPORT_TICKETS', COUNT(*) FROM SUPPORT.SUPPORT_TICKETS;
+
+SELECT COUNT(*) AS recent_orders_before
+FROM CUSTOMER.ORDERS
+WHERE ORDER_DATE >= DATE '2026-01-01';
+```
+
+### Task 1: Create a new subsetting policy and open the workflow
 
 1. Open **Data Safe** and select **Data subsetting**.
 2. On the overview page, select **Subset database** in the upper-right corner.
 3. In **Provide basic information**, select the database compartment and target database.
 4. Enter the target database credentials when prompted. Data Safe uses them to refresh statistics, estimate reduction, and run the subset job.
-5. Select an existing subsetting policy or select **Create subsetting policy**.
+5. In **Select subsetting policy compartment**, select the workshop compartment.
+6. Select **Create subsetting policy** and configure the new policy as described in Task 2.
 
 ![Data Safe data subsetting overview](images/subsetting-overview.png)
 
@@ -45,13 +66,14 @@ Continue acting as the database security administrator. The application team nee
 1. Set the policy compartment to the workshop compartment.
 2. Give the policy a descriptive name such as `Subset_SDM_CPS_2026_2026`.
 3. Add a description such as `Recent 2026 customer transaction data for application testing`.
-4. Use **Select schemas** when the sensitive-data-model option does not expose all three application schemas.
-5. Refresh the database schemas and select `CUSTOMER`, `PAYMENT`, and `SUPPORT`.
-6. Create the policy, then select it in the **Subset database** workflow.
+4. Select **Get schemas from sensitive data model**.
+5. In the sensitive data model compartment, select the model created in the Data Discovery lab, such as `SDM1`.
+6. Confirm that the model brings in the `CUSTOMER`, `PAYMENT`, and `SUPPORT` schemas automatically. Do not manually select the schemas in this flow.
+7. Select **Create subsetting policy** and wait for the policy to be available in the **Subset database** workflow.
 
 ![Create a three-schema subsetting policy](images/subsetting-schemas.png)
 
-### Task 3: Add the recent-orders rule
+### Task 3: Add subsetting rules
 
 1. Expand **Tables and subsetting rules** and select **Add subsetting rule**.
 2. Select `CUSTOMER.ORDERS` as the driving table.
@@ -87,6 +109,45 @@ The workflow applies the date condition first and the 10% retention second. It d
 4. Submit the subsetting job only after the review is complete.
 5. Monitor the work request and **Subsetting reports** until the job reaches a terminal status.
 6. Verify that the subset contains the recent order population and the related rows required by the application test.
+
+### Task 6: Review the subset and masked data
+
+After the subsetting job completes, connect to the subset target in SQL Developer or Database Actions. Compare the results with the baseline counts from the beginning of the lab.
+
+```sql
+SELECT 'CUSTOMER.ORDERS' AS table_name, COUNT(*) AS rows_after FROM CUSTOMER.ORDERS
+UNION ALL
+SELECT 'CUSTOMER.CUSTOMERS', COUNT(*) FROM CUSTOMER.CUSTOMERS
+UNION ALL
+SELECT 'CUSTOMER.ORDER_ITEMS', COUNT(*) FROM CUSTOMER.ORDER_ITEMS
+UNION ALL
+SELECT 'PAYMENT.PAYMENTS', COUNT(*) FROM PAYMENT.PAYMENTS
+UNION ALL
+SELECT 'SUPPORT.SUPPORT_TICKETS', COUNT(*) FROM SUPPORT.SUPPORT_TICKETS;
+
+SELECT ORDER_ID, CUSTOMER_ID, ORDER_DATE, ORDER_STATUS, ORDER_TOTAL
+FROM CUSTOMER.ORDERS
+WHERE ORDER_DATE >= DATE '2026-01-01'
+FETCH FIRST 10 ROWS ONLY;
+```
+
+If masking was enabled in the subsetting workflow, or the preceding masking job was run on this copy, inspect representative sensitive columns and confirm that values are masked while the required formats remain usable:
+
+```sql
+SELECT CUSTOMER_ID, FIRST_NAME, LAST_NAME, EMAIL_ADDRESS, PHONE_NUMBER
+FROM CUSTOMER.CUSTOMERS
+FETCH FIRST 10 ROWS ONLY;
+
+SELECT CARDHOLDER_NAME
+FROM PAYMENT.PAYMENTS
+FETCH FIRST 10 ROWS ONLY;
+
+SELECT CONTACT_EMAIL, CONTACT_PHONE
+FROM SUPPORT.SUPPORT_TICKETS
+FETCH FIRST 10 ROWS ONLY;
+```
+
+Confirm that the order count is smaller than the source count, that the retained orders are from `2026-01-01` onward, and that the related rows needed by the application remain available. When masking is enabled, confirm that the sensitive values are no longer the original values.
 
 ### Validation checklist
 
