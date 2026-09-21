@@ -113,6 +113,12 @@ The `DS$DATA_SUBSETTING_ROLE` grant gives the account the database privileges re
 8. For other related tables, keep the default **Keep maximum rows** unless the test scenario requires a different policy.
 9. Review the relationship graph before continuing.
 
+![Referential relationships in the subsetting policy](images/subsetting-policy-details.png)
+
+Open the **Referential relationships** tab on the subsetting policy details page to inspect the graph. Verify that `CUSTOMER.ORDERS` retains its `CUSTOMER.CUSTOMERS` ancestors and that `CUSTOMER.ORDER_ITEMS` and `PAYMENT.PAYMENTS` remain connected as descendants.
+
+
+
 The workflow applies the date condition first and the 10% retention second. It does not mean “10% of the full database”; it means 10% of the rows that satisfy `ORDER_DATE >= '01-JAN-26'`. In SQL, the equivalent date predicate is `ORDER_DATE >= DATE '2026-01-01'`.
 
 ![ORDER_DATE condition and 10 percent retention](images/condition-percentage-rule.png)
@@ -121,15 +127,16 @@ The workflow applies the date condition first and the 10% retention second. It d
 
 1. In **Select subsetting options**, review unrelated-table processing, degree of parallelism, redo logging, recompilation, and statistics refresh.
 2. Keep the defaults unless your target-database requirements call for a change.
-3. Because masking was handled in the previous lab, leave **Data masking after subsetting** disabled for this lab unless you intentionally want to combine both operations.
-4. Use the active policy details page as a reference for the options and policy state.
+3. Enable **Data masking after subsetting**.
+4. Select the previously created masking policy for the target database. Do not create a new masking policy here.
+5. Use the active policy details page as a reference for the options and policy state.
 
 ![Live OCI Data Safe subsetting policy details](images/subsetting-policy-details.png)
 
 ### Task 7: Review and submit
 
 1. Open **Review and submit**.
-2. Confirm the target database, policy name, selected schemas, driving table, rule condition, 10% retention, and relationship settings.
+2. Confirm the target database, policy name, selected schemas, driving table, rule condition, 10% retention, relationship settings, and the previously created masking policy.
 3. Confirm the estimated size reduction.
 4. Submit the subsetting job only after the review is complete.
 5. Monitor the work request and **Subsetting reports** until the job reaches a terminal status.
@@ -156,7 +163,7 @@ WHERE ORDER_DATE >= DATE '2026-01-01'
 FETCH FIRST 10 ROWS ONLY;
 ```
 
-If masking was enabled in the subsetting workflow, or the preceding masking job was run on this copy, inspect representative sensitive columns and confirm that values are masked while the required formats remain usable:
+After the subsetting job and the selected masking policy complete, inspect representative sensitive columns and confirm that values are masked while the required formats remain usable:
 
 ```sql
 SELECT CUSTOMER_ID, FIRST_NAME, LAST_NAME, EMAIL_ADDRESS, PHONE_NUMBER
@@ -172,7 +179,7 @@ FROM SUPPORT.SUPPORT_TICKETS
 FETCH FIRST 10 ROWS ONLY;
 ```
 
-Confirm that the order count is smaller than the source count, that the retained orders are from `2026-01-01` onward, and that the related rows needed by the application remain available. When masking is enabled, confirm that the sensitive values are no longer the original values.
+Confirm that the order count is smaller than the source count, that the retained orders are from `2026-01-01` onward, and that the related rows needed by the application remain available. Confirm that the selected masking policy has run and that the sensitive values are no longer the original values while required formats remain usable.
 
 ### Validation checklist
 
@@ -185,7 +192,7 @@ Confirm that the order count is smaller than the source count, that the retained
 | Retention | 10% of condition-matching rows |
 | Ancestors | Keep only referenced rows |
 | Descendants | Keep only referencing rows |
-| Masking | Disabled here; handled by the preceding masking lab |
+| Masking | Previously created masking policy selected and applied after subsetting |
 
 ### Learn More
 
