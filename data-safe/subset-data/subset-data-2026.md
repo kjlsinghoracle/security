@@ -67,7 +67,7 @@ WHERE ORDER_DATE >= DATE '2026-01-01';
 2. Give the policy a descriptive name such as `Subset_SDM_CPS_2026_2026`.
 3. Add a description such as `Recent 2026 customer transaction data for application testing`.
 4. Select **Get schemas from sensitive data model**.
-5. In the sensitive data model compartment, select the model created in the Data Discovery lab, such as `SDM1`.
+5. In the sensitive data model compartment, select the model created in the Data Discovery lab, such as `SDM_mainLL` in the reference environment.
 6. Confirm that the model brings in the `CUSTOMER`, `PAYMENT`, and `SUPPORT` schemas automatically. Do not manually select the schemas in this flow.
 7. Select **Create subsetting policy** and wait for the policy to be available in the **Subset database** workflow.
 
