@@ -22,7 +22,7 @@ Estimated Time: 20 minutes
 ### Prerequisites
 
 - An Oracle Cloud account with access to Data Safe.
-- The registered target database used in the discovery and masking labs (`ADB_2` in the reference screenshots).
+- The regastered target database used in the discovery and masking labs (`ADB_2` in the reference screenshots).
 - The previous sensitive data model, masking policy, and pre-masking checks completed.
 - Database credentials available for the target database when the workflow requests them.
 
@@ -30,7 +30,26 @@ Estimated Time: 20 minutes
 
 Continue acting as the database security administrator. The application team needs a recent, smaller dataset for testing customer profiles, orders, payments, and support tickets. Masking has already been planned and pre-checked. Now subset the source while preserving the relationships needed by the application.
 
-### Before you begin: Capture baseline row counts
+### Task 2: Create the Data Safe subsetting service account
+
+Before opening the subsetting workflow, have a database administrator create a dedicated account for Data Safe on the target database. Data Safe uses this account to authenticate to the target, refresh statistics, estimate the reduction, and run the subsetting job. Using a separate account keeps the job credentials scoped to the subsetting operation instead of reusing a personal administrator account.
+
+Connect to the target database as `ADMIN`, `SYS`, or another account that can create users and grant roles, then run the following. Replace `<strong-password>` with a password that meets your database password policy; store it securely because you will enter it in the Data Safe workflow.
+
+```sql
+CREATE USER DS_SUBSETTING IDENTIFIED BY "<strong-password>"
+  DEFAULT TABLESPACE "DATA"
+  TEMPORARY TABLESPACE "TEMP";
+
+GRANT CREATE SESSION TO DS_SUBSETTING;
+GRANT DS$DATA_SUBSETTING_ROLE TO DS_SUBSETTING;
+
+ALTER USER DS_SUBSETTING ACCOUNT UNLOCK;
+```
+
+The `DS$DATA_SUBSETTING_ROLE` grant gives the account the database privileges required by Data Safe for data subsetting. Do not use a personal administrator account for the workflow. If the target database already provides a registered Data Safe service account, follow the target-registration guidance for that database instead of creating a duplicate account.
+
+### Task 1: Capture baseline row counts
 
 Before subsetting, connect to the source database in SQL Developer or Database Actions and record the starting row counts. These counts make it easy to confirm the effect of the subset operation later.
 
@@ -47,21 +66,20 @@ SELECT 'SUPPORT.SUPPORT_TICKETS', COUNT(*) FROM SUPPORT.SUPPORT_TICKETS;
 
 SELECT COUNT(*) AS recent_orders_before
 FROM CUSTOMER.ORDERS
-WHERE ORDER_DATE >= DATE '2026-01-01';
-```
+WHERE ORDER_DATE >= DATE '2026-01-01';```
 
-### Task 1: Create a new subsetting policy and open the workflow
+### Task 3: Create a new subsetting policy and open the workflow
 
 1. Open **Data Safe** and select **Data subsetting**.
 2. On the overview page, select **Subset database** in the upper-right corner.
 3. In **Provide basic information**, select the database compartment and target database.
 4. Enter the target database credentials when prompted. Data Safe uses them to refresh statistics, estimate reduction, and run the subset job.
 5. In **Select subsetting policy compartment**, select the workshop compartment.
-6. Select **Create subsetting policy** and configure the new policy as described in Task 2.
+6. Select **Create subsetting policy** and configure the new policy as described in Task 4.
 
 ![Data Safe data subsetting overview](images/subsetting-overview.png)
 
-### Task 2: Create the subsetting policy scope
+### Task 4: Create the subsetting policy scope
 
 1. Set the policy compartment to the workshop compartment.
 2. Give the policy a descriptive name such as `Subset_SDM1_2026`.
@@ -73,7 +91,7 @@ WHERE ORDER_DATE >= DATE '2026-01-01';
 
 ![Create a three-schema subsetting policy](images/subsetting-schemas.png)
 
-### Task 3: Add subsetting rules
+### Task 5: Add subsetting rules
 
 1. Expand **Tables and subsetting rules** and select **Add subsetting rule**.
 2. Select `CUSTOMER.ORDERS` as the driving table.
@@ -92,7 +110,7 @@ The workflow applies the date condition first and the 10% retention second. It d
 
 ![ORDER_DATE condition and 10 percent retention](images/condition-percentage-rule.png)
 
-### Task 4: Review subsetting options
+### Task 6: Review subsetting options
 
 1. In **Select subsetting options**, review unrelated-table processing, degree of parallelism, redo logging, recompilation, and statistics refresh.
 2. Keep the defaults unless your target-database requirements call for a change.
@@ -101,7 +119,7 @@ The workflow applies the date condition first and the 10% retention second. It d
 
 ![Live OCI Data Safe subsetting policy details](images/subsetting-policy-details.png)
 
-### Task 5: Review and submit
+### Task 7: Review and submit
 
 1. Open **Review and submit**.
 2. Confirm the target database, policy name, selected schemas, driving table, rule condition, 10% retention, and relationship settings.
@@ -110,7 +128,7 @@ The workflow applies the date condition first and the 10% retention second. It d
 5. Monitor the work request and **Subsetting reports** until the job reaches a terminal status.
 6. Verify that the subset contains the recent order population and the related rows required by the application test.
 
-### Task 6: Review the subset and masked data
+### Task 8: Review the subset and masked data
 
 After the subsetting job completes, connect to the subset target in SQL Developer or Database Actions. Compare the results with the baseline counts from the beginning of the lab.
 
