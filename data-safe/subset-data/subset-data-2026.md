@@ -12,13 +12,10 @@ Estimated Time: 20 minutes
 
 ### Objectives
 
-- Open the Data Safe data subsetting overview and start the **Subset database** workflow.
-- Create a subsetting policy that includes the `CUSTOMER`, `PAYMENT`, and `SUPPORT` schemas.
-- Add a driving-table rule for `CUSTOMER.ORDERS`.
-- In OCI's condition field, enter `ORDER_DATE >= '01-JAN-26'`, then retain 10% of the matching rows. This is the OCI UI representation of January 1, 2026; use the ANSI SQL form `DATE '2026-01-01'` in SQL Developer or Database Actions.
-- Keep referenced ancestor rows and referencing descendant rows so referential integrity is preserved.
-- Review the subsetting options and submit only when the configuration is correct.
-
+- Prepare the target database and required access for subsetting.
+- Create a subsetting policy and define the data-selection rules.
+- Review the subsetting configuration and submit the job.
+- Validate the subset and confirm related data remains consistent.
 ### Prerequisites
 
 - An Oracle Cloud account with access to Data Safe.
@@ -51,10 +48,11 @@ FROM CUSTOMER.ORDERS
 WHERE ORDER_DATE >= DATE '2026-01-01';
 ```
 
-### Task 2: Create the Data Safe subsetting service account
+
+### Task 2: Create the DS_SUBSETTING database user
 
 
-Before opening the subsetting workflow, have a database administrator create a dedicated account for Data Safe on the target database. Data Safe uses this account to authenticate to the target, refresh statistics, estimate the reduction, and run the subsetting job. Using a separate account keeps the job credentials scoped to the subsetting operation instead of reusing a personal administrator account.
+Before opening the subsetting workflow, have a database administrator create a dedicated database user named `DS_SUBSETTING` on the target database. This target-database user is separate from the Oracle Data Safe service account used when the target is registered. Data Safe uses the `DS_SUBSETTING` credentials to connect to the target, refresh statistics, estimate the reduction, and run the subsetting job. Using a dedicated user keeps the job credentials scoped to the subsetting operation instead of reusing a personal administrator account.
 
 
 Connect to the target database as `ADMIN`, `SYS`, or another account that can create users and grant roles, then run the following. Replace `<strong-password>` with a password that meets your database password policy; store it securely because you will enter it in the Data Safe workflow.
