@@ -30,24 +30,6 @@ Estimated Time: 20 minutes
 
 Continue acting as the database security administrator. The application team needs a recent, smaller dataset for testing customer profiles, orders, payments, and support tickets. Masking has already been planned and pre-checked. Now subset the source while preserving the relationships needed by the application.
 
-### Task 2: Create the Data Safe subsetting service account
-
-Before opening the subsetting workflow, have a database administrator create a dedicated account for Data Safe on the target database. Data Safe uses this account to authenticate to the target, refresh statistics, estimate the reduction, and run the subsetting job. Using a separate account keeps the job credentials scoped to the subsetting operation instead of reusing a personal administrator account.
-
-Connect to the target database as `ADMIN`, `SYS`, or another account that can create users and grant roles, then run the following. Replace `<strong-password>` with a password that meets your database password policy; store it securely because you will enter it in the Data Safe workflow.
-
-```sql
-CREATE USER DS_SUBSETTING IDENTIFIED BY "<strong-password>"
-  DEFAULT TABLESPACE "DATA"
-  TEMPORARY TABLESPACE "TEMP";
-
-GRANT CREATE SESSION TO DS_SUBSETTING;
-GRANT DS$DATA_SUBSETTING_ROLE TO DS_SUBSETTING;
-
-ALTER USER DS_SUBSETTING ACCOUNT UNLOCK;
-```
-
-The `DS$DATA_SUBSETTING_ROLE` grant gives the account the database privileges required by Data Safe for data subsetting. Do not use a personal administrator account for the workflow. If the target database already provides a registered Data Safe service account, follow the target-registration guidance for that database instead of creating a duplicate account.
 
 ### Task 1: Capture baseline row counts
 
@@ -68,6 +50,32 @@ SELECT COUNT(*) AS recent_orders_before
 FROM CUSTOMER.ORDERS
 WHERE ORDER_DATE >= DATE '2026-01-01';
 ```
+
+### Task 2: Create the Data Safe subsetting service account
+
+
+Before opening the subsetting workflow, have a database administrator create a dedicated account for Data Safe on the target database. Data Safe uses this account to authenticate to the target, refresh statistics, estimate the reduction, and run the subsetting job. Using a separate account keeps the job credentials scoped to the subsetting operation instead of reusing a personal administrator account.
+
+
+Connect to the target database as `ADMIN`, `SYS`, or another account that can create users and grant roles, then run the following. Replace `<strong-password>` with a password that meets your database password policy; store it securely because you will enter it in the Data Safe workflow.
+
+
+```sql
+CREATE USER DS_SUBSETTING IDENTIFIED BY "<strong-password>"
+  DEFAULT TABLESPACE "DATA"
+  TEMPORARY TABLESPACE "TEMP";
+
+
+GRANT CREATE SESSION TO DS_SUBSETTING;
+GRANT DS$DATA_SUBSETTING_ROLE TO DS_SUBSETTING;
+
+
+ALTER USER DS_SUBSETTING ACCOUNT UNLOCK;
+```
+
+
+The `DS$DATA_SUBSETTING_ROLE` grant gives the account the database privileges required by Data Safe for data subsetting. Do not use a personal administrator account for the workflow. If the target database already provides a registered Data Safe service account, follow the target-registration guidance for that database instead of creating a duplicate account.
+
 
 ### Task 3: Create a new subsetting policy and open the workflow
 
