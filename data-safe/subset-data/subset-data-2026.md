@@ -66,7 +66,8 @@ SELECT 'SUPPORT.SUPPORT_TICKETS', COUNT(*) FROM SUPPORT.SUPPORT_TICKETS;
 
 SELECT COUNT(*) AS recent_orders_before
 FROM CUSTOMER.ORDERS
-WHERE ORDER_DATE >= DATE '2026-01-01';```
+WHERE ORDER_DATE >= DATE '2026-01-01';
+```
 
 ### Task 3: Create a new subsetting policy and open the workflow
 
