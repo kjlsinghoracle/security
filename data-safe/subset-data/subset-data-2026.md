@@ -88,7 +88,7 @@ The workflow uses the masking policy created in the preceding masking lab. In th
    | Sensitive data model compartment | The compartment containing `SDM1` |
    | Sensitive data model | `SDM1` |
 
-   ![Create Subset SDM1 inside the Subset database workflow](images/wizard-create-policy.png)
+   ![Create Subset SDM1 inside the Subset database workflow](images/wizard-create-policy-fixed.png)
 
 4. Select **View** beside **Schemas** and confirm that the model contains the schemas required by this lab. For the reference workflow, these are `CUSTOMER`, `PAYMENT`, and `SUPPORT`. Select **Close** to return to the creation panel.
 5. Select **Create subsetting policy**. When the policy is created, select `Subset SDM1` in the wizard and select **Next** to open **Tables and subsetting rules**.
