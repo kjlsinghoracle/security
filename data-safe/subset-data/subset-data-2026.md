@@ -42,7 +42,7 @@ FROM CUSTOMER.ORDERS
 WHERE ORDER_DATE >= DATE '2026-01-01';
 ```
 
-The `recent_orders_before` result is the population to which the 10% rule will apply. Row counts for related tables follow the relationship settings and need not fall by the same percentage. Keep Database Actions or SQL Developer available for Task 6.
+The `recent_orders_before` result is the population to which the 10% rule will apply. Row counts for related tables follow the relationship settings and need not fall by the same percentage. Keep Database Actions or SQL Developer available for Task 5.
 
 ### Task 2: Create the DS_SUBSETTING database user
 
@@ -63,44 +63,48 @@ ALTER USER DS_SUBSETTING ACCOUNT UNLOCK;
 
 The example uses the Autonomous Database tablespaces `DATA` and `TEMP`. For another database type, use the tablespaces supplied by your DBA. Keep the `DS_SUBSETTING` username and password available for the wizard; this user does not replace the registered Data Safe service account. Ensure the required privileges for the combined subsetting and masking operation are in place before submission.
 
-### Task 3: Create and configure Subset SDM1
+### Task 3: Complete the Subset database workflow
 
-The console version shown in this lab defines rules and associates a masking policy on the subsetting policy pages. The **Subset database** wizard then reviews those saved settings and runs subsetting followed by masking. Complete this setup before starting the wizard; its **Tables and subsetting rules** and **Configure data masking** stages do not provide rule-creation or masking-policy-selection controls in this version.
+Use the **Subset database** workflow from start to finish. In this workflow, step 1 creates the new subsetting policy and step 2 adds its subsetting rules. Do not create the policy or rules separately from the **Subsetting policies** page for this walkthrough.
 
-The screenshots show a reference environment. Its sensitive data model is named `SDM_mainLL` and its masking policy is named `Mask_mainLL`. In your lab, use `SDM1` and the previously created `Mask_SDM1`. Create the subsetting policy as **Subset SDM1**. Database names, compartments, counts, and estimates may differ.
+The workflow uses the masking policy created in the preceding masking lab. In this lab, use the existing `Mask_SDM1`; do not create another masking policy. The screenshots show a reference environment, so database names, compartments, schemas, counts, and estimates may differ.
 
-#### Create the policy
+1. In **Data Safe**, open **Data subsetting**, then **Overview**. Select **Subset database**.
 
-1. In **Data Safe**, open **Data subsetting**, then **Subsetting policies**. Select **Create subsetting policy**. If you already created **Subset SDM1** in this lab, open that policy and continue with **Add the driving-table rule** below instead of creating a duplicate.
-2. Enter the policy details:
+   ![Data Subsetting overview with the Subset database action](images/subsetting-overview.png)
+
+#### Wizard step 1: Provide basic information
+
+1. Select the target database compartment and database from Task 1. Enter the `DS_SUBSETTING` username and the password created in Task 2. These credentials are used to refresh statistics, calculate estimates, run the subsetting job, and apply masking when configured.
+2. Select **Refresh database statistics** and wait for the refresh to complete before continuing.
+3. Select **Create subsetting policy**. In the creation panel, enter the following values:
 
    | Field | Value |
    | --- | --- |
+   | Compartment | Your workshop compartment |
    | Name | `Subset SDM1` |
    | Description | `Recent 2026 customer transaction data for application testing` |
-   | Compartment | Your workshop compartment |
+   | Policy source | **Get schemas from sensitive data model** |
+   | Sensitive data model compartment | The compartment containing `SDM1` |
+   | Sensitive data model | `SDM1` |
 
-   ![Create subsetting policy with the name Subset SDM1](images/subsetting-create-policy.png)
+   ![Create Subset SDM1 inside the Subset database workflow](images/wizard-create-policy.png)
 
-3. Under **Policy source details**, select the database compartment and the workshop database from Task 1. Select **Get schemas from sensitive data model**, then choose the compartment containing **SDM1** and select **SDM1**.
-4. Beside **Schemas**, select **View** and confirm that the model includes `CUSTOMER`, `PAYMENT`, and `SUPPORT`. Select **Close** to return to the creation panel. Do not proceed with a model containing different schemas.
+4. Select **View** beside **Schemas** and confirm that the model contains the schemas required by this lab. For the reference workflow, these are `CUSTOMER`, `PAYMENT`, and `SUPPORT`. Select **Close** to return to the creation panel.
+5. Select **Create subsetting policy**. When the policy is created, select `Subset SDM1` in the wizard and select **Next** to open **Tables and subsetting rules**.
 
-   ![Policy source details showing the workshop database and the three application schemas; the reference model is SDM_mainLL](images/subsetting-policy-source.png)
+#### Wizard step 2: Tables and subsetting rules
 
-5. Select **Create subsetting policy**. Wait until the policy is **Active**, then open **Subset SDM1** if its details page is not already displayed.
+1. A newly created policy starts with no subsetting rules. Select **Add subsetting rule**.
+2. In **Add driving tables**, select the row whose schema is `CUSTOMER` and table is `ORDERS`. Review the ancestor and descendant counts, then select **Next**.
 
-#### Add the driving-table rule and review the relationship graph
+   ![Add CUSTOMER.ORDERS as the driving table in the wizard](images/wizard-add-driving-table.png)
 
-1. On **Subset SDM1**, open **Subsetting rules** and select **Add subsetting rule**.
-2. In **Add driving tables**, select the row whose schema is **CUSTOMER** and table is **ORDERS**. Review its ancestor and descendant counts, then select **Next**.
+3. In **Define rule**, select **View relationship graph** before finalizing the rule. Use the graph to follow `ORDERS` to its related tables, including `CUSTOMERS`, `ORDER_ITEMS`, and `PAYMENTS`. Select **Legend** to understand the table roles, use **Fit to canvas** or the zoom controls as needed, and select **Close** to return to **Define rule**.
 
-   ![Add driving tables with CUSTOMER.ORDERS selected](images/subsetting-add-driving-table.png)
+   ![View the referential relationship graph from the wizard rule editor](images/wizard-relationship-graph.png)
 
-3. In **Define rule**, select **View relationship graph**. Locate `ORDERS` as the driving table and follow its relationships to `CUSTOMERS`, `ORDER_ITEMS`, and `PAYMENTS`. Also inspect `PRODUCTS` and `SUPPORT_TICKETS`, which are other related tables in this example. Select **Legend** to understand the table roles. Use **Fit to canvas** or the zoom controls if needed, then select **Close** to return to **Define rule**.
-
-   ![Relationship graph opened from Define rule, showing ORDERS and the related application tables](images/subsetting-rule-relationship-graph.png)
-
-4. For **Select rule type**, select **Condition and percentage**. Enter:
+4. Under **Select rule type**, select **Condition and percentage**. Enter:
 
    | Field | Value |
    | --- | --- |
@@ -109,60 +113,19 @@ The screenshots show a reference environment. Its sensitive data model is named 
    | Value | `01-JAN-26` |
    | Percentage of rows to retain | `10` |
 
-   The condition is evaluated first, and 10% of the matching orders are retained. The equivalent SQL date predicate is `ORDER_DATE >= DATE '2026-01-01'`.
+   The condition is evaluated first, and 10% of the matching `CUSTOMER.ORDERS` rows are retained. The equivalent SQL date predicate is `ORDER_DATE >= DATE '2026-01-01'`.
 
 5. Under **Ancestors**, select **Keep only referenced rows** to retain the customers referenced by the retained orders.
 6. Under **Descendants**, select **Keep only referencing rows** to retain the related order items and payments. Leave **Remove all rows** unselected.
-7. Under **Other related tables**, select **Keep maximum rows** for this lab. Review the graph to understand how this applies to the remaining related tables; the 10% setting does not apply independently to every table.
+7. Under **Other related tables**, select **Keep maximum rows** for this lab. The 10% setting applies to the condition-matching driving-table rows; it does not independently limit every related table.
 
-   ![Define rule showing the date condition, 10 percent retention, and related-table actions](images/subsetting-define-rule.png)
+   ![Define the condition-and-percentage rule and related-table actions in the wizard](images/wizard-define-rule.png)
 
-8. Select **Next** to open **Review and add**. Verify the condition, percentage, related-table actions, and relationship graph, then select **Add**.
-9. Back on **Subsetting rules**, confirm that `CUSTOMER.ORDERS` appears with **Condition and percentage**, `ORDER_DATE >= '01-JAN-26'`, and `10%`. If the rule already existed, verify it instead of adding it again.
+8. Select **Next** to open **Review and add**. Verify the condition, percentage, ancestor action, descendant action, other-related-table action, and relationship graph.
 
-#### Associate the previously created masking policy
+   ![Review the new subsetting rule before adding it to the policy](images/wizard-review-add.png)
 
-1. Open the **Details** tab of **Subset SDM1**.
-2. In **Masking policy**, beside **Data masking after subsetting**, select **Enable**.
-3. In **Edit masking policy**, select the compartment containing the masking policy from the preceding lab, then select **Mask_SDM1**. Reuse that policy; do not create a new masking policy.
-
-   ![Edit masking policy panel for selecting an existing policy; the reference environment uses Mask_mainLL](images/subsetting-associate-masking-policy.png)
-
-4. Select **Update**. Wait for the update to finish and confirm that data masking after subsetting is enabled and the associated masking policy is **Mask_SDM1**. If it was already enabled, verify the existing association rather than enabling it again.
-
-This associates the policies; it does not run either job. The combined operation is submitted in the next task.
-
-### Task 4: Complete the Subset database workflow
-
-1. Return to **Data subsetting** and open **Overview**.
-2. Select **Subset database** in the upper-right corner.
-
-![Data subsetting Overview page showing the Subset database button](images/subsetting-overview.png)
-
-Complete all five stages below. The rule and masking policy configured in Task 3 are used in this same run.
-
-#### Wizard step 1: Provide basic information
-
-1. Select the database compartment and the registered workshop database used in Task 1.
-2. Enter `DS_SUBSETTING` and the password created in Task 2.
-3. Select **Refresh database statistics** if the statistics are missing or out of date. Wait for the operation to finish, then review **All tables size** and **All tables row count**.
-4. Select the subsetting policy compartment and **Subset SDM1**. Use the policy already configured in Task 3; do not create an empty policy here.
-5. Select **Next** to open **Tables and subsetting rules**.
-
-#### Wizard step 2: Tables and subsetting rules
-
-1. Wait for subset estimates to finish calculating. Confirm that the table lists `CUSTOMER.ORDERS`, **Condition and percentage**, the January 1, 2026 date condition, and **10%**.
-2. Review **Estimated subset**: **Rows kept**, **Subset size**, and **Storage reclaimed**. These estimates cover the driving table and related tables, so they need not show a 90% reduction overall.
-
-   ![Tables and subsetting rules stage showing the saved orders rule and subset estimates](images/subsetting-wizard-rules.png)
-
-3. Open the rule's three-dot **Actions** menu and select **View details**. Check the condition, percentage, and **Related tables actions** against Task 3. Use the **View** buttons to inspect ancestors and descendants.
-
-   ![Rule details opened within the Subset database wizard](images/subsetting-wizard-rule-details.png)
-
-4. Select **View processing sequence** to inspect the table-processing order. Close the detail panels to return to **Tables and subsetting rules**.
-5. If the rule is absent or incorrect, cancel the wizard, correct **Subset SDM1** on its **Subsetting rules** tab, and restart from **Overview → Subset database**. This wizard stage reviews saved rules; it does not add or edit them in the console version shown.
-6. Select **Next** to open **Select subsetting options**.
+9. Select **Add**. Wait while Data Safe adds the rule and recalculates the table estimates. Confirm that `CUSTOMER.ORDERS` appears under **Tables and subsetting rules** with **Condition and percentage**, `ORDER_DATE >= '01-JAN-26'`, and `10%`. Use **Add subsetting rule** again if the workflow requires additional driving-table rules. When the rules are complete, select **Next**.
 
 #### Wizard step 3: Select subsetting options
 
@@ -178,13 +141,13 @@ Complete all five stages below. The rule and masking policy configured in Task 3
 
 #### Wizard step 4: Configure data masking
 
-1. Confirm that **Apply data masking after subsetting** is checked and **Masking policy** shows **Mask_SDM1**. In this console version, these values are inherited from the subsetting policy and the checkbox is read-only; the policy was selected in Task 3.
+1. Confirm that **Apply data masking after subsetting** is checked and **Masking policy** shows **Mask_SDM1**. In this console version, these values are inherited from the association with the previously created masking policy and the checkbox is read-only. The workflow consumes `Mask_SDM1`; it does not create a new masking policy.
 
    ![Configure data masking within the wizard, showing the associated policy; the reference policy is Mask_mainLL](images/subsetting-wizard-masking.png)
 
 2. Select **View details** to open **Masking policy details**. Review **Masking columns**, **General information**, and **Masking options**. Confirm the policy identity and the sensitive columns configured in the preceding lab across `CUSTOMER.CUSTOMERS`, `CUSTOMER.ORDERS`, `PAYMENT.PAYMENTS`, and `SUPPORT.SUPPORT_TICKETS`.
 3. Select **Close** to return to the wizard.
-4. If the checkbox is unchecked and you see **No masking policy is associated with the selected subsetting policy**, do not submit an unmasked run. Cancel, complete the association in Task 3, and restart the wizard with **Subset SDM1**.
+4. If the checkbox is unchecked and you see **No masking policy is associated with the selected subsetting policy**, do not submit an unmasked run. Cancel, associate the existing `Mask_SDM1` with `Subset SDM1` using the policy association control, and restart the wizard. Do not submit an unmasked run.
 
    ![Warning displayed when no masking policy is associated; complete policy setup before proceeding](images/subsetting-masking-prerequisite.png)
 
@@ -211,7 +174,8 @@ Complete all five stages below. The rule and masking policy configured in Task 3
 
 4. Select **Submit** to start the combined operation. Keep the progress panel open and follow the work-request link when it becomes available.
 
-### Task 5: Monitor subsetting and masking
+
+### Task 4: Monitor subsetting and masking
 
 1. Open the operation's **Work request** page and review **Details**.
 2. Under **Subsetting job information**, confirm that the policy is `Subset SDM1` and wait for the subsetting job to show **Succeeded**.
@@ -219,7 +183,8 @@ Complete all five stages below. The rule and masking policy configured in Task 3
 4. If either job fails, review **Error messages** and the work-request logs. Resolve the reported issue before treating the data as ready for application testing.
 5. Follow the **View** links for the subsetting and masking reports. Review the row-count and size reduction in the subsetting report and the masked columns and job results in the masking report.
 
-### Task 6: Review the subset and masked data
+
+### Task 5: Review the subset and masked data
 
 After both jobs succeed, connect to the same workshop database in SQL Developer or Database Actions. Compare these row counts with the baseline recorded in Task 1.
 
